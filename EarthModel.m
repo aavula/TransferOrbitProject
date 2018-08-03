@@ -12,13 +12,17 @@ r = (a_E.*(1-e_E.^2))./(1+e_E.*cos(nu));
 r_pos = [r.*cos(nu); r.*sin(nu)];
 
 figure;
-plotv(r_pos,'-');
-
-% M = moviein(length(nu));
-% for j=1:length(nu)
-%     plot(x,u(j,:)), M(:,j)=getframe;
-% end
-% movie(M);
+while true
+for k = 1:length(nu)
+    f = r_pos(:,k);
+    plotv(f,'o-')
+    grid
+    axis square
+    xlim([-2e8 2e8])
+    ylim([-2e8 2e8])
+    drawnow 
+end 
+end 
 
 
 
