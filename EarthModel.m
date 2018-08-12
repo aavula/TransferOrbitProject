@@ -38,18 +38,26 @@ for k = 1:length(t)
     f = r_posE(:,k);
     g = r_posM(:,k);
     h = r_posM2(:,k);
-    if nuM2(k) < nuM(k)
-    deltaT = abs(sqrt(a_M.^3./mu).*(2*pi + E_M2-e_M.*sin(E_M2) - (E_M - e_M.*sin(E_M)))); 
-    else 
-    deltaT = abs(sqrt(a_M.^3./mu).*(E_M2-e_M.*sin(E_M2) - (E_M - e_M.*sin(E_M)))); 
-    end 
-    a_s = ((2*pi*deltaT./((nuM2(k) - nuE(k)))).^2./lambda).^(1/3);
-    e_s = (r_E(k).*cos(nuE(k) - sqrt(r_E(k).^2.*cos(nuE(k)).^2+4.*a_s.*(abs(a_s-r_E(k)))))/(-2.*a_s));
     
-    if nuE(k) < nuM2(k)
-    nus = nuE(k):.0001:nuM2(k);
-    elseif nuE(k) > nuM2(k)
-        nus = nuM2(k):.0001:nuE(k);
+    fnuE = nuE(k)/(2.*pi) - fix(nuE(k)./(2.*pi)).*2.*pi;
+    fnuM2 = nuM2(k)/(2.*pi) - fix(nuM2(k)./(2.*pi)).*2.*pi;
+    deltanu = ((nuM(k)/(2.*pi) - fix(nuM(k)./(2.*pi)).*2.*pi))-(nuE(k)/(2.*pi) - fix(nuM(k)./(2.*pi)).*2.*pi);
+    deltanu2 = ((nuM2(k)/(2.*pi) - fix(nuM2(k)./(2.*pi)).*2.*pi))-(nuE(k)/(2.*pi) - fix(nuM(k)./(2.*pi)).*2.*pi);
+    deltaT = abs((deltanu-deltanu2)/(-omegaM));
+    
+    
+    %if nuM2(k) < nuM(k)
+    %deltaT = abs(sqrt(a_M.^3./mu).*(2*pi + E_M2-e_M.*sin(E_M2) - (E_M - e_M.*sin(E_M)))); 
+    %else 
+    %deltaT = abs(sqrt(a_M.^3./mu).*(E_M2-e_M.*sin(E_M2) - (E_M - e_M.*sin(E_M)))); 
+    %end 
+    a_s = ((2*pi*deltaT./deltanu2).^2./lambda).^(1/3);
+    e_s = (r_E(k).*cos(fnuE) -sqrt(r_E(k).^2.*cos(fnuE).^2+4.*a_s.*(abs(a_s-r_E(k))))./(-2.*a_s));
+    
+    if fnuE < fnuM2
+    nus = fnuE:.0001:fnuM2;
+    elseif fnuE > fnuM2
+        nus = fnuM2:.0001:fnuE;
     else 
         continue 
     end 
