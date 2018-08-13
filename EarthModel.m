@@ -33,20 +33,30 @@ r_posM2 = [r_M2.*cos(nuM2); r_M2.*sin(nuM2)];
 
 figure(1)
 for k = 1:length(t)
-    E_M = acos((e_M+cos(nuM(k)))/(1+e_M*cos(nuM(k))));
-    E_M2 = acos((e_M+cos(nuM2(k)))/(1+e_M*cos(nuM2(k))));
+    fnuE = abs(nuE(k)/(2.*pi) - fix(nuE(k)./(2.*pi)).*2.*pi);
+    fnuM = abs(nuM(k)/(2.*pi) - fix(nuM(k)./(2.*pi)).*2.*pi);
+    
+    
+    E_M = acos((e_M+cos(fnuM))/(1+e_M*cos(fnuM)));
+    %E_M2 = acos((e_M+cos(nuM2(k)))/(1+e_M*cos(nuM2(k))));
     f = r_posE(:,k);
     g = r_posM(:,k);
     h = r_posM2(:,k);
     
-    fnuE = abs(nuE(k)/(2.*pi) - fix(nuE(k)./(2.*pi)).*2.*pi);
-    fnuM = abs(nuM(k)/(2.*pi) - fix(nuM(k)./(2.*pi)).*2.*pi);
-    fnuM2 = abs(nuM2(k)/(2.*pi) - fix(nuM2(k)./(2.*pi)).*2.*pi);
-    deltanu = fnuM - fnuE;
-    deltanu2 = fnuM2- fnuE;
-    deltaT = abs((deltanu-deltanu2)/(omegaM));
     
+    %fnuM2 = abs(nuM2(k)/(2.*pi) - fix(nuM2(k)./(2.*pi)).*2.*pi);
+    %deltanu = fnuM - fnuE;
+    %deltanu2 = fnuM2- fnuE;
+   
+    deltaT = 30*6;
+    syms E_2
+    E_2s = double(vpasolve(E_2 - e_M.*sin(E_2) == deltaT./sqrt(a_M^3/mu) - 2.*0.*pi + E_M - e_M.*sin(E_M),E_2 ));
     
+    nuM2 = acos((a_M.*cos(E_2s)-a_M.*e_M)/r_M(k));
+    
+    fnuM2 = (nuM2/(2.*pi) - fix(nuM2./(2.*pi)).*2.*pi);
+    
+    deltanu2 = (nuM2-nuM(k));
     %if nuM2(k) < nuM(k)
     %deltaT = abs(sqrt(a_M.^3./mu).*(2*pi + E_M2-e_M.*sin(E_M2) - (E_M - e_M.*sin(E_M)))); 
     %else 
@@ -61,20 +71,18 @@ for k = 1:length(t)
     e_s = (e_s1 - sqrt(e_s2+e_s3))/e_s4;
     
     
-    if fnuE > fnuM2
-    nus = 0:2*pi/365:fnuE;
-    elseif fnuE < fnuM2
-        nus = 0:.0001:fnuM2;
-    else 
-        continue 
-    end 
+   if fnuE < fnuM
+    nus = fnuE:2*pi/365:fnuM;
+   else 
+       nus = fnuM:2*pi/365:fnuE;
+   end 
         
     r_s = (a_s.*(1-e_s.^2))./(1+e_s.*cos(nus));
     [xs,ys] = pol2cart(nus,r_s);
     plotv(f,'bo-')
     hold on 
     plotv(g,'ro-')
-    plotv(h,'mo-')
+    %plotv(h,'mo-')
     grid
     axis square
     xlim([-3e8 3e8])
