@@ -1,0 +1,19 @@
+%Constants file
+clear all; close all; clc
+T = 2;
+t = 0:365*T; %Increment of days
+deltaT = 30*6;
+a_E = 1.496e8; %km
+e_E = 0.0167; % unitless
+b_E = a_E*sqrt(1-e_E^2); %semiminor axis
+a_M = 2.2792e8;
+e_M = 0.0935;
+b_M = a_M*sqrt(1-e_M^2);
+mu = 6.67408e-11*1.989e30*(1e-9/1.33959e-10);
+lambda = 4*pi^2/mu;
+omegaE = 2*pi/365.2;
+omegaM = 2*pi/687;
+nuE = omegaE*t;
+nuM = omegaM*t;
+
+save('constants')
