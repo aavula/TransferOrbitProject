@@ -1,0 +1,35 @@
+%Final Project Segment to find values for E_2
+clear all; close all; clc
+tic 
+T = 2.5;
+t = 0:365*T;
+a_M = 2.2792e8;
+e_M = 0.0935;
+deltaT = 30*6;
+mu = 6.67408e-11*1.989e30*(1e-9/1.33959e-10);
+omegaE = 2*pi/365.2;
+omegaM = 2*pi/687;
+nuE = omegaE*t;
+nuM = omegaM*t;
+
+r_M = (a_M.*(1-e_M.^2))./(1+e_M.*cos(nuM));
+
+E_2s = zeros(1,length(t));
+fnuE = zeros(1,length(t));
+fnuM = zeros(1,length(t));
+E_M = zeros(1,length(t));
+
+for j = 1:length(t)
+syms E_2
+fnuE(j) = (nuE(j)/(2.*pi))-fix(nuE(j)/(2.*pi));
+fnuM(j) = (nuM(j)/(2.*pi) - fix(nuM(j)./(2.*pi)));
+arg = round(((a_M.*e_M+r_M(j).*cos(fnuM(j)))./(a_M)),2);  
+E_M(j) = acos(arg);
+
+E_2s(j) = double(vpasolve(deltaT.*sin(E_M(j)/2)^3 == E_M(j) - E_2 + sin(E_M(j))-sin(E_2) , E_2 ));
+
+
+end 
+toc 
+
+save('E2','fnuE', 'fnuM','E_M','E_2s')
