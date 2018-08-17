@@ -11,37 +11,33 @@ E_2s = zeros(1,length(t));
 fnuE = zeros(1,length(t));
 fnuM = zeros(1,length(t));
 E_M = zeros(1,length(t));
+E_E = zeros(1,length(t));
 arg = zeros(1,length(t));
 Mn = zeros(1,length(maxIter));
 Mo = zeros(1,length(t));
 peri = min(r_M);
-
-
-
-for j = 1:length(t)
+E_E(1) = 0;
+for j = 2:length(t)
 %syms E_2
 fnuE(j) = (nuE(j)/(2.*pi))-fix(nuE(j)/(2.*pi));
 fnuM(j) = (nuM(j)/(2.*pi) - fix(nuM(j)./(2.*pi)));
 arg(j) = (((a_M - r_M(j))/(e_M*a_M)));
-E_M(j) = acos(arg(j));
-Mo(j) = E_M(j)-e_M*sin(E_M(j));
+ 
+M = sqrt(mu/a_E^3)*deltaT+E_E(j-1);
 
-M = sqrt(mu/a_M^3)*deltaT + 2*pi + Mo(j);
-E2i = zeros(1,length(t));
-E2i(1) = pi/4;
 
 for k = 2:maxIter
-    Mn(k) = E2i(k-1)-e_M*sin(E2i(k-1));
-    E2i(k) = E2i(k-1) + (M-Mn(k))/(1-e_M*cos(E2i(k-1)));
-    if abs(E2i(k) - E2i(k-1)) < tol
+    E_E(1) = 0+E_E(j-1);
+    Mn = E_E(k-1)-e_E*sin(E_E(k-1));
+    E_E(k) = E_E(k-1) + (M - Mn)/(1-e_E*cos(E_E(k-1)));
+    if M-Mn < tol
         break
     end 
+    
 end 
-E_2s(j) = E2i(k);
-%E_2s(j) = double(vpasolve(deltaT.*sin(E_M(j)/2)^3 == E_M(j) - E_2 + sin(E_M(j))-sin(E_2) , E_2 ));
-
-
+E_E(j) = E_E(k);
 end 
-toc 
 
-save('E2','fnuE', 'fnuM','E_M','E_2s')
+
+
+save('E2','fnuE', 'fnuM','E_M','E_2s','E_E')
