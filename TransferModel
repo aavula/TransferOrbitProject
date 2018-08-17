@@ -18,11 +18,30 @@ r_posM = [r_M.*cos(nuM); r_M.*sin(nuM)];
 [xE,yE] = pol2cart(nuE,r_E); %Plots the actual ellipses
 [xM,yM] = pol2cart(nuM,r_M);
 %deltaT = zeros(1:length(t));
+arg2 = ((cos(E_2s) -e_M)./(1-e_M.*cos(E_2s)));
+nuM2 = zeros(1,length(arg2));
 
-nuM2 = acos((cos(E_2s) -e_M)./(1-e_M.*cos(E_2s)));
-fnuM2 = (nuM2/(2.*pi) - fix(nuM2./(2.*pi)).*2.*pi);
-E_E = acos((a_E.*e_E+r_E.*cos(nuE))./(a_E));  
-r_M2= (a_M.*(1-e_M^2))./(1+e_M.*cos(nuM2));
+nuM2 = acos(arg2);
+
+    
+%if arg2(l) < 0 
+%nuM2(l) = -acos(arg2(l));
+%elseif arg2(l) > 0 
+    %nuM2(l) = acos(arg2(l));
+%elseif arg2(l-1) > 0
+    %nuM2(l) = -acos(arg2(l));
+    %else
+        
+        %nuM2(l) = acos(arg2(l));
+%end 
+%end 
+nuM2 = nuM + omegaM*deltaT;
+fnuM2 = (nuM2 - fix(nuM2./(2.*pi)).*2.*pi);
+
+arg3 = ((a_E.*e_E+r_E.*cos(nuE))./(a_E));
+%E_E = 2*atan(tan(nuE)/sqrt((1+e_E)/(1-e_E)));
+        
+r_M2 = (a_M.*(1-e_M^2))./(1+e_M.*cos(nuM2));
 
 r_posM2 = [r_M2.*cos(nuM2); r_M2.*sin(nuM2)];
 
@@ -57,24 +76,26 @@ for k = 1:length(t)
     s = (r_E(k)+r_M2(k)+c)/2;
     %a_s = ((2*pi*deltaT./deltanu2).^2./lambda).^(1/3);
     
-    a_s = s/(2*sin(fnuE(k)/2));
-    e_s = (1-r_E(k)/a_s)/(-cos(E_E(k)));
+    a_s = s/(1-cos(nuE(k)));
+    e_s = (1-r_E(k)/a_s)/(cos(E_E(k)));
     
     %e_s1 = r_E(k).*cos(fnuE(k)); %-b
     %e_s2 = r_E(k).^2.*cos(fnuE(k)).^2; %b^2
     %e_s3 = 4.*a_s.*(a_s-r_E(k)); %4ac
     %e_s4 = -2.*a_s.^2; %2a
     %e_s = (e_s1 - sqrt(e_s2+e_s3))/e_s4;
+    %nus = 0:.001:2*pi;
     
-    
-   if fnuE(k) < fnuM2(k)
-    nus = fnuE(k):.00001:fnuM(k);
+  %{ 
+if fnuE(k) < fnuM2(k)
+    nus = fnuE(k):.001:fnuM(k);
    elseif fnuE(k) > fnuM2(k)
-       nus = fnuM(k):.00001:fnuE(k);
+       nus = fnuM(k):.001:fnuE(k);
    else 
        continue
-   end 
-       
+end
+       %}
+    nus = 0:2*pi/365:2*pi;
     r_s = (a_s.*(1-e_s.^2))./(1+e_s.*cos(nus));
 
     [xs,ys] = pol2cart(nus,r_s);
@@ -84,8 +105,8 @@ for k = 1:length(t)
     plotv(h,'mo-')
     grid
     axis square
-    xlim([-3e8 3e8])
-    ylim([-3e8 3e8])
+    xlim([-4e8 4e8])
+    ylim([-4e8 4e8])
     plot(xE,yE, 'b')
     plot(xM,yM, 'r')
     plot(xs,ys)
