@@ -1,6 +1,6 @@
 %Constants file
 clear all; close all; clc
-T = 2;
+T = 3;
 t = 0:365*T; %Increment of days
 deltaT = 30*6;
 a_E = 1.496e8; %km
